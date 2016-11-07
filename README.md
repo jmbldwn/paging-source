@@ -1,3 +1,5 @@
+[![Published on webcomponents.org](https://img.shields.io/badge/webcomponents.org-published-blue.svg)](https://beta.webcomponents.org/element/owner/my-element)
+
 # paging-source
 
 This web component automatically makes paged requests for data from a URL to populate a local list.  
