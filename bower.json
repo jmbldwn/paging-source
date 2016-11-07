@@ -1,0 +1,30 @@
+{
+  "name": "paging-source",
+  "version": "1.0",
+  "authors": [
+    "Jim Baldwin <jim@antimatter.ai>"
+  ],
+  "description": "A web component that automatically pages data from a server url.",
+  "keywords": [
+    "web-component",
+    "web-components",
+    "polymer",
+    "iron-list"
+  ],
+  "main": "paging-soource.html",
+  "license": "http://polymer.github.io/LICENSE.txt",
+  "homepage": "https://github.com/jmbldwn/paging-source/",
+  "ignore": [
+    "/.*",
+    "/test/",
+    "/demo/"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.4.0"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "web-component-tester": "^4.0.0",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0"
+  }
+}
