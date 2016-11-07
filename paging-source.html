@@ -1,0 +1,106 @@
+'use strict';
+/* jshint esversion:6 */
+
+<link rel="import" href="/bower_components/polymer/polymer.html">
+
+<dom-module id="paging-source">
+    <script>
+        Polymer({
+            is: 'paging-source',
+
+            properties: {
+                url: {
+                    type: String,
+                    observer: '_reset'
+                },
+                pageSize: {
+                    type: Number,
+                    observer: '_reset'
+                },
+                firstVisibleIndex: {
+                    type: Number,
+                    observer: '_scrollCheck'
+                },
+                lastVisibleIndex: {
+                    type: Number,
+                    observer: '_scrollCheck'
+                },
+                readAhead: {
+                    type: Number,
+                    observer: '_scrollCheck'
+                },
+                readBehind: {
+                    type: Number,
+                    observer: '_scrollCheck'
+                },
+                items: {
+                    type: Array,
+                    notify: true
+                }
+            },
+
+            ready: function() {
+                this.version = 0;
+                this._reset();
+            },
+
+            _reset: function() {
+                this.set('items', []);
+                this.pageStatus = {};
+                this.lastPage = -1;
+                this.version += 1;
+                this._getPage(this.url, 0, this.pageSize);
+            },
+
+            _pageFromIndex: function(index) {
+                return Math.floor(index / this.pageSize);
+            },
+
+            _scrollCheck: function() {
+                let firstLoadedPage = this._pageFromIndex(Math.max(0, this.firstVisibleIndex - this.readBehind));
+                let lastLoadedPage = this._pageFromIndex(this.lastVisibleIndex + this.readAhead);
+                if (this.lastPage >= 0 && lastLoadedPage > this.lastPage) {
+                    lastLoadedPage = this.lastPage;
+                }
+                for (let page = firstLoadedPage; page <= lastLoadedPage; page++) {
+                    if (!this.pageStatus[page] || this.pageStatus[page] === 'error') {
+                        this._getPage(this.url, page, this.pageSize);
+                    }
+                }
+            },
+
+            _getPage: function(url, page, pageSize) {
+                if (!this.url || this.url.length < 1 || this.url === 'undefined' || this.pageStatus[page] === 'done') return;
+
+                let skip = page * pageSize;
+                let limit = pageSize;
+                let version = this.version;
+
+                this.pageStatus[page] = 'loading';
+
+                let self = this;
+                fetch(url + '?skip=' + skip + '&limit=' + limit)
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(results) {
+                    if (version === self.version) {
+                        self.pageStatus[page] = 'done';
+
+                        if (results.length < pageSize && self.lastPage === -1) {
+                            self.lastPage = page;
+                        }
+
+                        if (results.length > 0) {
+                            self.splice.apply(self, Array.prototype.concat(['items', skip, results.length], results));
+                        }
+                    }
+                })
+                .catch(function(error) {
+                    console.error('error downloading items', error.message);
+                    self.pageStatus[page] = 'error';
+                });
+            }
+        });
+    </script>
+</dom-module>
